@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cairo", sans-serif;
+  --font-body: "Tajawal", sans-serif;
+  --font-kufi: "Reem Kufi", sans-serif;
+
+  /* طلباتك brand palette (sampled from the logo) */
+  --color-leaf: #aac937;        /* lime green */
+  --color-leaf-deep: #8aa823;   /* darker green for text on light */
+  --color-ink: #2f4858;         /* navy slate */
+  --color-ink-soft: #46606f;
+  --color-cream: #f7faef;       /* soft green-tinted off white */
+  --color-cream-2: #eef3df;
+  --color-line: #e6ecd5;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: #ffffff;
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* subtle entrance animations */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.rise { animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.floaty { animation: floaty 6s ease-in-out infinite; }
+.caret { animation: blink 1s step-end infinite; }
