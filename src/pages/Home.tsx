@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import icon from "../assets/tlbatk-icon.png";
 import PriceCalculator from "../components/PriceCalculator";
+import ContactForm from "../components/ContactForm";
 import { waLink, INTEGRATIONS, TESTIMONIALS } from "../config";
 
 const stats = [
@@ -357,6 +358,18 @@ export default function Home() {
               <Faq key={i} q={f.q} a={f.a} />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Contact Form */}
+      <section id="contact" className="mx-auto max-w-[1200px] px-5 py-16 md:px-8 md:py-24">
+        <SectionHead
+          eyebrow="تواصل معنا"
+          title="أرسل رسالتك"
+          sub="هل عندك سؤال أو تريد معرفة المزيد؟ تواصل معنا وسنرد عليك في أسرع وقت."
+        />
+        <div className="mt-12 mx-auto max-w-2xl rounded-3xl border border-line bg-white p-7 md:p-10">
+          <ContactForm />
         </div>
       </section>
 
