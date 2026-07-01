@@ -1,10 +1,27 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Send, CheckCircle2, AlertCircle } from "lucide-react";
+
+const FORM_ID = import.meta.env.VITE_FORMSPREE_ID || "xyzjkqvb";
+const API_TIMEOUT = 15000; // 15 seconds
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, []);
+
+  const validateEmail = (email: string): boolean => {
+    return EMAIL_REGEX.test(email.trim());
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -12,40 +29,76 @@ export default function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (status === "loading") return;
+
     setStatus("loading");
     setErrorMsg("");
 
     const { name, email, phone, message } = formData;
-    if (!name.trim() || !email.trim() || !message.trim()) {
+
+    // Validation
+    if (!name.trim()) {
       setStatus("error");
-      setErrorMsg("الرجاء ملء جميع الحقول المطلوبة");
+      setErrorMsg("الاسم مطلوب");
       return;
     }
 
+    if (!validateEmail(email)) {
+      setStatus("error");
+      setErrorMsg("البريد الإلكتروني غير صحيح");
+      return;
+    }
+
+    if (!message.trim()) {
+      setStatus("error");
+      setErrorMsg("الرسالة مطلوبة");
+      return;
+    }
+
+    // Abort previous request if still pending
+    if (abortRef.current) {
+      abortRef.current.abort();
+    }
+    abortRef.current = new AbortController();
+
+    // Create timeout
+    const timeoutId = setTimeout(() => {
+      abortRef.current?.abort();
+      setStatus("error");
+      setErrorMsg("انتهت مهلة الإرسال. حاول مرة أخرى.");
+    }, API_TIMEOUT);
+
     try {
-      const response = await fetch("https://formspree.io/f/xyzjkqvb", {
+      const response = await fetch(`https://formspree.io/f/${FORM_ID}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          email,
-          phone: phone || "لم يتم إدخاله",
-          message,
-          _subject: `رسالة جديدة من ${name}`,
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim() || "—",
+          message: message.trim(),
+          _subject: `رسالة من ${name.trim()}`,
         }),
+        signal: abortRef.current.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         setStatus("success");
         setFormData({ name: "", email: "", phone: "", message: "" });
-        setTimeout(() => setStatus("idle"), 5000);
+        timeoutRef.current = setTimeout(() => setStatus("idle"), 5000);
       } else {
-        throw new Error("فشل الإرسال");
+        throw new Error();
       }
     } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        return;
+      }
       setStatus("error");
-      setErrorMsg("حدث خطأ أثناء الإرسال. جرب مرة أخرى.");
-      console.error(error);
+      setErrorMsg("حدث خطأ. حاول مرة أخرى.");
     }
   };
 
@@ -95,6 +148,8 @@ export default function ContactForm() {
           value={formData.phone}
           onChange={handleChange}
           placeholder="05XXXXXXXX"
+          maxLength={20}
+          pattern="[0-9\-\+\s]+"
           className="w-full rounded-lg border border-line bg-white px-4 py-3 text-ink outline-none transition focus:border-leaf focus:ring-2 focus:ring-leaf/20 placeholder:text-ink-soft/50"
         />
       </div>
@@ -134,6 +189,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === "loading"}
+        aria-busy={status === "loading"}
         className="w-full rounded-lg bg-leaf px-6 py-3 font-display font-extrabold text-ink shadow-md shadow-leaf/30 transition hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {status === "loading" ? (
