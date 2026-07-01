@@ -425,9 +425,9 @@ function Faq({ q, a }: { q: string; a: string }) {
 function SectionHead({ eyebrow, title, sub }: { eyebrow: string; title: string; sub: string }) {
   return (
     <div className="mx-auto max-w-2xl text-center">
-      <span className="font-kufi text-base font-bold tracking-widest text-leaf-deep">{eyebrow}</span>
-      <h2 className="mt-4 font-display text-5xl font-black leading-tight text-ink sm:text-6xl md:text-7xl">{title}</h2>
-      <p className="mt-5 text-lg leading-loose text-ink-soft sm:text-xl">{sub}</p>
+      <span className="font-kufi text-sm font-bold tracking-widest text-leaf-deep sm:text-base">{eyebrow}</span>
+      <h2 className="mt-3 font-display text-4xl font-black leading-tight text-ink sm:text-5xl lg:text-6xl">{title}</h2>
+      <p className="mt-4 text-base leading-relaxed text-ink-soft sm:text-lg">{sub}</p>
     </div>
   );
 }
