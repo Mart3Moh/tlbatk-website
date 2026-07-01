@@ -11,7 +11,7 @@ export default function Footer() {
             <img src={logo} alt="طلباتك TLBATK" className="h-20 w-auto" />
             <p className="mt-4 max-w-sm leading-loose text-ink-soft">
               شريك التوصيل للمتاجر الإلكترونية والمطاعم والمتاجر المحلية، نوصّل طلباتك بسرعة
-              مع تتبّع لحظي داخل {BRAND.city} وقريباً كل مدن المملكة.
+              وموثوقاً مع تتبّع لحظي داخل {BRAND.city} وقريباً كل مدن المملكة.
             </p>
             <div className="mt-5 flex gap-3">
               <a href={BRAND.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-ink-soft transition hover:border-leaf hover:text-leaf-deep">

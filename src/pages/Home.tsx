@@ -30,15 +30,15 @@ import { waLink, INTEGRATIONS, TESTIMONIALS } from "../config";
 
 const stats = [
   { value: "60", label: "متوسط زمن التوصيل" },
-  { value: "+50", label: "حي مغطّى في جدة" },
+  { value: "+100", label: "حي مغطّى في جدة ومكة" },
   { value: "%99", label: "نسبة تسليم ناجحة" },
   { value: "فوري", label: "تخصيص المندوب" },
 ];
 
 const audiences = [
-  { icon: Store, title: "المتاجر الإلكترونية", desc: "نوصّل طلبات متجرك لعملائك في جدة بسرعة واحترافية تعكس صورة علامتك." },
+  { icon: Store, title: "المتاجر الإلكترونية", desc: "نوصّل طلبات متجرك لعملائك في جدة ومكة بسرعة واحترافية تعكس صورة علامتك." },
   { icon: UtensilsCrossed, title: "المطاعم", desc: "توصيل سريع للطلبات يحافظ على جودة الطلب ويصل العميل وهو راضٍ." },
-  { icon: ShoppingBag, title: "المتاجر المحلية", desc: "خدمة توصيل مرنة لمحلك تساعدك توصل لعملاء أكثر داخل المدينة." },
+  { icon: ShoppingBag, title: "المتاجر المحلية", desc: "خدمة توصيل مرنة لمحلك تساعدك توصل لعملاء أكثر داخل جدة ومكة." },
 ];
 
 const steps = [
@@ -52,14 +52,14 @@ const services = [
   { icon: Inbox, title: "استقبال الطلبات", desc: "آلية مرنة وسهلة لإرسال الطلبات بسرعة ودون تعقيد." },
   { icon: Zap, title: "استجابة سريعة", desc: "نتعامل مع طلبك فور وصوله بدون انتظار." },
   { icon: UserCheck, title: "تخصيص المندوب المناسب", desc: "نختار أقرب مندوب متاح في أقصر وقت ممكن." },
-  { icon: Truck, title: "توصيل داخل أحياء جدة", desc: "تنفيذ كفؤ لعمليات التوصيل في مختلف الأحياء." },
+  { icon: Truck, title: "توصيل داخل جدة ومكة", desc: "تنفيذ كفؤ لعمليات التوصيل في مختلف أحياء جدة ومكة." },
   { icon: Radar, title: "متابعة حتى التسليم", desc: "تتابع حالة الطلب وتتأكد من وصوله لعميلك." },
   { icon: ShieldCheck, title: "خدمة بمستوى ثابت", desc: "نحافظ على جودة خدمة تليق بسمعة متجرك." },
 ];
 
 const features = [
   { icon: Zap, title: "سرعة في الاستلام والتنفيذ", desc: "نستلم وننفّذ بأسرع وقت لأن السرعة عنصر أساسي في رضا العميل." },
-  { icon: MapPin, title: "تغطية واسعة لأحياء جدة", desc: "نغطّي معظم أحياء جدة بشبكة مناديب منتشرة." },
+  { icon: MapPin, title: "تغطية واسعة في جدة ومكة", desc: "نغطّي معظم أحياء جدة ومكة بشبكة مناديب منتشرة." },
   { icon: Handshake, title: "شراكة موثوقة مع المتاجر", desc: "نتعامل كشريك لوجستي يهمّه نمو متجرك لا مجرد مزوّد خدمة." },
   { icon: Smartphone, title: "سهولة إرسال ومتابعة الطلبات", desc: "ترسل الطلب وتتابع حالته بكل بساطة دون أي تعقيد." },
   { icon: ShieldCheck, title: "احترافية في التعامل", desc: "تعامل احترافي مع متجرك ومع عملائك في كل خطوة." },
@@ -68,15 +68,15 @@ const features = [
 const speedPoints = [
   "الاستجابة السريعة للطلبات.",
   "تخصيص المندوب المناسب في أقصر وقت ممكن.",
-  "تنفيذ التوصيل بكفاءة عالية داخل مختلف أحياء جدة.",
+  "تنفيذ التوصيل بكفاءة عالية داخل جدة ومكة.",
   "الحفاظ على مستوى خدمة ثابت يليق بسمعة متجرك.",
 ];
 
 const faqs = [
   { q: "كيف أرسل الطلب لكم؟", a: "ترسل تفاصيل الطلب مباشرة عبر وسائل التواصل المتفق عليها (واتساب أو ربط مع متجرك)، ونبدأ التنفيذ فوراً." },
-  { q: "كم يستغرق توصيل الطلب؟", a: "نخصّص أقرب مندوب متاح ونبدأ التوصيل فوراً، مع متابعة مستمرة حتى التسليم داخل أحياء جدة." },
+  { q: "كم يستغرق توصيل الطلب؟", a: "نخصّص أقرب مندوب متاح ونبدأ التوصيل فوراً، مع متابعة مستمرة حتى التسليم داخل جدة ومكة." },
   { q: "هل أقدر أتابع حالة الطلب؟", a: "نعم، فيه صفحة تتبّع تعرض حالة الطلب خطوة بخطوة، وتقدر تتابع بسهولة حتى يصل لعميلك." },
-  { q: "هل تخدمون المطاعم والمتاجر المحلية؟", a: "نعم، نخدم المتاجر الإلكترونية والمطاعم والمتاجر المحلية داخل جدة بخدمة توصيل احترافية." },
+  { q: "هل تخدمون المطاعم والمتاجر المحلية؟", a: "نعم، نخدم المتاجر الإلكترونية والمطاعم والمتاجر المحلية داخل جدة ومكة بخدمة توصيل احترافية." },
   { q: "هل يمكن الربط مع متجري في سلة أو زد؟", a: "نعم، نقدر نربط مع متجرك عند الحاجة لاستقبال الطلبات تلقائياً، إضافة إلى الإرسال عبر واتساب." },
 ];
 
@@ -99,7 +99,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-[1200px] items-center gap-12 px-5 pb-16 pt-12 md:px-8 md:pb-24 md:pt-16 lg:grid-cols-2">
           <div className="rise">
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-1.5 text-sm font-medium text-leaf-deep">
-              <span className="h-2 w-2 rounded-full bg-leaf" /> خدمة توصيل احترافية داخل جدة
+              <span className="h-2 w-2 rounded-full bg-leaf" /> خدمة توصيل احترافية داخل جدة ومكة
             </span>
             <h1 className="mt-5 font-display text-[32px] font-black leading-[1.2] text-ink sm:text-5xl lg:text-6xl lg:leading-[1.1]">
               نوصّل طلباتك بسرعة
@@ -109,7 +109,7 @@ export default function Home() {
             <p className="mt-5 max-w-md text-base leading-loose text-ink-soft sm:text-lg">
               تجربة العميل ما تنتهي عند إتمام الطلب — تبدأ من لحظة استلامه وحتى وصوله لباب
               العميل. نوفّر توصيلاً سريعاً وموثوقاً للمتاجر الإلكترونية والمطاعم والمتاجر
-              المحلية داخل جدة.
+              المحلية داخل جدة ومكة.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <button
@@ -157,7 +157,7 @@ export default function Home() {
 
       {/* Audiences */}
       <section id="audiences" className="mx-auto max-w-[1200px] px-5 py-16 md:px-8 md:py-24">
-        <SectionHead eyebrow="من نخدم ؟" title="شريك التوصيل لمتجرك" sub="نخدم المتاجر الإلكترونية والمطاعم والمتاجر المحلية داخل جدة." />
+        <SectionHead eyebrow="من نخدم ؟" title="شريك التوصيل لمتجرك" sub="نخدم المتاجر الإلكترونية والمطاعم والمتاجر المحلية داخل جدة ومكة." />
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {audiences.map((a) => (
             <div key={a.title} className="group rounded-3xl border border-line bg-white p-7 transition hover:-translate-y-1 hover:border-leaf hover:shadow-xl hover:shadow-ink/5">
@@ -314,7 +314,7 @@ export default function Home() {
           <SectionHead
             eyebrow="حاسبة الأسعار"
             title="احسب تكلفة التوصيل"
-            sub="تقدير فوري لتكلفة التوصيل داخل جدة. أسعار شفافة بدون مفاجآت."
+            sub="تقدير فوري لتكلفة التوصيل داخل جدة ومكة. أسعار شفافة بدون مفاجآت."
           />
           <div className="mt-12">
             <PriceCalculator />
@@ -324,7 +324,7 @@ export default function Home() {
 
       {/* Testimonials */}
       <section id="testimonials" className="mx-auto max-w-[1200px] px-5 py-16 md:px-8 md:py-24">
-        <SectionHead eyebrow="آراء العملاء" title="شركاؤنا يحكون عننا" sub="متاجر ومطاعم وثقت بطلباتك في توصيل طلباتها." />
+        <SectionHead eyebrow="آراء العملاء" title="شركاؤنا يحكون عننا" sub="متاجر ومطاعم في جدة ومكة وثقت بطلباتك في توصيل طلباتها." />
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {TESTIMONIALS.map((t) => (
             <figure key={t.name} className="flex flex-col rounded-3xl border border-line bg-white p-7">
