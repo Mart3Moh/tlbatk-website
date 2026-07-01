@@ -36,8 +36,8 @@ export default function Footer() {
           <div>
             <h4 className="font-display font-extrabold text-ink">تواصل معنا</h4>
             <ul className="mt-4 space-y-2.5 text-ink-soft">
-              <li><button onClick={() => window.open(waLink(), "_blank", "noopener")} className="transition hover:text-leaf-deep">واتساب — تواصل الآن</button></li>
-              <li><a href={`mailto:${BRAND.email}`} className="transition hover:text-leaf-deep">{BRAND.email}</a></li>
+              <li><button onClick={() => window.open(waLink(), "_blank", "noopener")} className="font-bold transition hover:text-leaf-deep">💬 واتساب — تواصل مباشرة</button></li>
+              <li className="text-sm">متوفر 24/7 للإجابة على أسئلتك</li>
             </ul>
           </div>
         </div>
