@@ -10,7 +10,7 @@ const links = [
   { href: "/#integrations", label: "الربط مع متجرك" },
   { href: "/#pricing", label: "الأسعار" },
   { href: "/#contact", label: "التواصل" },
-  { href: "/policy", label: "السياسة" },
+  { href: "/policy", label: "سياسة التعويض" },
   { href: "/#faq", label: "الأسئلة" },
 ];
 
