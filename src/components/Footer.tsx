@@ -30,6 +30,7 @@ export default function Footer() {
               <li><a href="/#audiences" className="transition hover:text-leaf-deep">من نخدم</a></li>
               <li><a href="/#integrations" className="transition hover:text-leaf-deep">الربط مع متجرك</a></li>
               <li><Link to="/track" className="transition hover:text-leaf-deep">تتبّع طلبك</Link></li>
+              <li><Link to="/policy" className="transition hover:text-leaf-deep">سياسة التعويض</Link></li>
             </ul>
           </div>
 

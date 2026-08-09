@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import WhatsAppWidget from "./components/WhatsAppWidget";
 import Home from "./pages/Home";
 import Track from "./pages/Track";
+import Policy from "./pages/Policy";
 
 function ScrollManager() {
   const { pathname, hash } = useLocation();
@@ -30,6 +31,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/track" element={<Track />} />
+          <Route path="/policy" element={<Policy />} />
           <Route path="*" element={<Home />} />
         </Routes>
         <Footer />
