@@ -10,6 +10,7 @@ const links = [
   { href: "/#integrations", label: "الربط مع متجرك" },
   { href: "/#pricing", label: "الأسعار" },
   { href: "/#contact", label: "التواصل" },
+  { href: "/policy", label: "السياسة" },
   { href: "/#faq", label: "الأسئلة" },
 ];
 
@@ -29,11 +30,17 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 text-[15px] font-medium lg:flex">
-          {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-ink-soft transition hover:text-leaf-deep">
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) =>
+            l.href.startsWith("/") ? (
+              <Link key={l.href} to={l.href} className="text-ink-soft transition hover:text-leaf-deep">
+                {l.label}
+              </Link>
+            ) : (
+              <a key={l.href} href={l.href} className="text-ink-soft transition hover:text-leaf-deep">
+                {l.label}
+              </a>
+            )
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -63,11 +70,17 @@ export default function Navbar() {
       {open && (
         <div className="border-t border-line bg-white px-5 py-3 lg:hidden">
           <nav className="flex flex-col gap-1">
-            {links.map((l) => (
-              <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-ink-soft transition hover:bg-cream">
-                {l.label}
-              </a>
-            ))}
+            {links.map((l) =>
+              l.href.startsWith("/") ? (
+                <Link key={l.href} to={l.href} onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-ink-soft transition hover:bg-cream">
+                  {l.label}
+                </Link>
+              ) : (
+                <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-xl px-3 py-2.5 text-ink-soft transition hover:bg-cream">
+                  {l.label}
+                </a>
+              )
+            )}
             <button
               onClick={() => { setOpen(false); navigate("/track"); }}
               className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-right font-bold text-ink transition hover:bg-cream"
