@@ -42,13 +42,23 @@ export default function Offers() {
             {activeOffers.map((offer) => (
               <div
                 key={offer.id}
-                className="rounded-3xl border-2 border-leaf bg-white p-7 hover:shadow-lg transition"
+                className="rounded-3xl border-2 border-leaf bg-white overflow-hidden hover:shadow-lg transition"
               >
-                {/* Discount Badge */}
-                <div className="inline-flex items-center gap-2 rounded-full bg-leaf/15 px-4 py-2 mb-4">
-                  <Zap className="h-4 w-4 text-leaf-deep" />
-                  <span className="font-bold text-leaf-deep">{offer.discount}% خصم</span>
-                </div>
+                {/* Image */}
+                {offer.image && (
+                  <img
+                    src={offer.image}
+                    alt={offer.title}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+
+                <div className="p-7">
+                  {/* Discount Badge */}
+                  <div className="inline-flex items-center gap-2 rounded-full bg-leaf/15 px-4 py-2 mb-4">
+                    <Zap className="h-4 w-4 text-leaf-deep" />
+                    <span className="font-bold text-leaf-deep">{offer.discount}% خصم</span>
+                  </div>
 
                 {/* Title */}
                 <h3 className="font-display text-xl font-black text-ink mb-2">{offer.title}</h3>
@@ -87,15 +97,16 @@ export default function Offers() {
                   </div>
                 )}
 
-                {/* CTA */}
-                <a
-                  href="https://wa.me/966541722219?text=أبغى أستفيد من العرض"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full rounded-lg bg-ink px-4 py-3 text-center font-bold text-white transition hover:brightness-110"
-                >
-                  استفد من العرض
-                </a>
+                  {/* CTA */}
+                  <a
+                    href="https://wa.me/966541722219?text=أبغى أستفيد من العرض"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full rounded-lg bg-ink px-4 py-3 text-center font-bold text-white transition hover:brightness-110"
+                  >
+                    استفد من العرض
+                  </a>
+                </div>
               </div>
             ))}
           </div>

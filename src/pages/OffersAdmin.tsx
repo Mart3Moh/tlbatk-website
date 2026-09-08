@@ -16,9 +16,29 @@ export default function OffersAdmin() {
     code: "",
     expiryDate: "",
     active: true,
+    image: "",
   });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState("");
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setSubmitMessage("حجم الصورة يجب أن يكون أقل من 5MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setFormData({ ...formData, image: base64 });
+      setImagePreview(base64);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Check if already authenticated
   useEffect(() => {
@@ -73,7 +93,9 @@ export default function OffersAdmin() {
       code: "",
       expiryDate: "",
       active: true,
+      image: "",
     });
+    setImagePreview(null);
 
     setTimeout(() => setSubmitMessage(""), 3000);
   };
@@ -86,12 +108,15 @@ export default function OffersAdmin() {
       code: offer.code || "",
       expiryDate: offer.expiryDate,
       active: offer.active,
+      image: offer.image || "",
     });
+    setImagePreview(offer.image || null);
     setEditingId(offer.id);
   };
 
   const handleCancel = () => {
     setEditingId(null);
+    setImagePreview(null);
     setFormData({
       title: "",
       description: "",
@@ -99,6 +124,7 @@ export default function OffersAdmin() {
       code: "",
       expiryDate: "",
       active: true,
+      image: "",
     });
   };
 
@@ -229,6 +255,33 @@ export default function OffersAdmin() {
               </div>
             </div>
 
+            {/* Image Upload */}
+            <div>
+              <label className="block text-sm font-bold text-ink mb-2">صورة العرض (اختياري)</label>
+              <div className="rounded-lg border-2 border-dashed border-line p-6 bg-cream/50 text-center">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label htmlFor="image-upload" className="cursor-pointer block">
+                  {imagePreview ? (
+                    <div className="space-y-3">
+                      <img src={imagePreview} alt="معاينة" className="h-32 mx-auto rounded-lg object-cover" />
+                      <p className="text-sm text-ink-soft">اضغط لتغيير الصورة</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-ink">اضغط لرفع صورة</p>
+                      <p className="text-xs text-ink-soft">PNG, JPG بحد أقصى 5MB</p>
+                    </div>
+                  )}
+                </label>
+              </div>
+            </div>
+
             <div className="flex items-center gap-3">
               <input
                 type="checkbox"
@@ -284,9 +337,16 @@ export default function OffersAdmin() {
               {offers.map((offer) => (
                 <div
                   key={offer.id}
-                  className="rounded-2xl bg-white p-5 border border-line hover:border-leaf transition"
+                  className="rounded-2xl bg-white border border-line hover:border-leaf transition overflow-hidden"
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start justify-between gap-4 p-5">
+                    {offer.image && (
+                      <img
+                        src={offer.image}
+                        alt={offer.title}
+                        className="w-20 h-20 rounded-lg object-cover shrink-0"
+                      />
+                    )}
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-display text-lg font-black text-ink">{offer.title}</h3>

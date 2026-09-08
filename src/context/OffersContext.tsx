@@ -8,6 +8,7 @@ export interface Offer {
   code?: string;
   expiryDate: string; // YYYY-MM-DD
   active: boolean;
+  image?: string; // base64 encoded image
   createdAt: string;
 }
 
