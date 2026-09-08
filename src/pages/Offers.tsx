@@ -62,10 +62,14 @@ export default function Offers() {
                   )}
 
                 <div className="p-7">
-                  {/* Discount Badge */}
+                  {/* Discount/Price Badge */}
                   <div className="inline-flex items-center gap-2 rounded-full bg-leaf/15 px-4 py-2 mb-4">
                     <Zap className="h-4 w-4 text-leaf-deep" />
-                    <span className="font-bold text-leaf-deep">{offer.discount}% خصم</span>
+                    <span className="font-bold text-leaf-deep">
+                      {offer.discountType === "percentage"
+                        ? `${offer.discount}% خصم`
+                        : `${offer.fixedPrice} ريال`}
+                    </span>
                   </div>
 
                 {/* Title */}

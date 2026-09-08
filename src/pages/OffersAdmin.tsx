@@ -12,7 +12,9 @@ export default function OffersAdmin() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    discountType: "percentage" as "percentage" | "fixed",
     discount: 10,
+    fixedPrice: 0,
     code: "",
     expiryDate: "",
     active: true,
@@ -89,7 +91,9 @@ export default function OffersAdmin() {
     setFormData({
       title: "",
       description: "",
+      discountType: "percentage",
       discount: 10,
+      fixedPrice: 0,
       code: "",
       expiryDate: "",
       active: true,
@@ -104,7 +108,9 @@ export default function OffersAdmin() {
     setFormData({
       title: offer.title,
       description: offer.description,
-      discount: offer.discount,
+      discountType: offer.discountType,
+      discount: offer.discount || 10,
+      fixedPrice: offer.fixedPrice || 0,
       code: offer.code || "",
       expiryDate: offer.expiryDate,
       active: offer.active,
@@ -120,7 +126,9 @@ export default function OffersAdmin() {
     setFormData({
       title: "",
       description: "",
+      discountType: "percentage",
       discount: 10,
+      fixedPrice: 0,
       code: "",
       expiryDate: "",
       active: true,
@@ -209,16 +217,43 @@ export default function OffersAdmin() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-ink mb-2">نسبة الخصم % *</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={formData.discount}
-                  onChange={(e) => setFormData({ ...formData, discount: parseInt(e.target.value) })}
+                <label className="block text-sm font-bold text-ink mb-2">نوع العرض *</label>
+                <select
+                  value={formData.discountType}
+                  onChange={(e) => setFormData({ ...formData, discountType: e.target.value as "percentage" | "fixed" })}
                   className="w-full rounded-lg border border-line bg-white px-4 py-3 text-ink outline-none transition focus:border-leaf focus:ring-2 focus:ring-leaf/20"
-                />
+                >
+                  <option value="percentage">خصم بنسبة (%)</option>
+                  <option value="fixed">سعر ثابت (ريال)</option>
+                </select>
               </div>
+
+              {formData.discountType === "percentage" ? (
+                <div>
+                  <label className="block text-sm font-bold text-ink mb-2">نسبة الخصم % *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={formData.discount || 10}
+                    onChange={(e) => setFormData({ ...formData, discount: parseInt(e.target.value) })}
+                    className="w-full rounded-lg border border-line bg-white px-4 py-3 text-ink outline-none transition focus:border-leaf focus:ring-2 focus:ring-leaf/20"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-bold text-ink mb-2">السعر الثابت (ريال) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={formData.fixedPrice || 0}
+                    onChange={(e) => setFormData({ ...formData, fixedPrice: parseFloat(e.target.value) })}
+                    placeholder="مثال: 50 ريال"
+                    className="w-full rounded-lg border border-line bg-white px-4 py-3 text-ink outline-none transition focus:border-leaf focus:ring-2 focus:ring-leaf/20"
+                  />
+                </div>
+              )}
             </div>
 
             <div>
@@ -356,7 +391,14 @@ export default function OffersAdmin() {
                       </div>
                       <p className="text-ink-soft mb-2">{offer.description}</p>
                       <div className="flex flex-wrap gap-4 text-sm text-ink-soft">
-                        <span>خصم: <strong className="text-leaf-deep">{offer.discount}%</strong></span>
+                        <span>
+                          {offer.discountType === "percentage"
+                            ? `خصم: ${offer.discount}%`
+                            : `سعر: ${offer.fixedPrice} ريال`}
+                          <strong className="text-leaf-deep ml-1">
+                            {offer.discountType === "percentage" ? "%" : "ريال"}
+                          </strong>
+                        </span>
                         {offer.code && <span>الكود: <strong className="text-ink">{offer.code}</strong></span>}
                         <span>الانتهاء: <strong>{new Date(offer.expiryDate).toLocaleDateString("ar-SA")}</strong></span>
                       </div>

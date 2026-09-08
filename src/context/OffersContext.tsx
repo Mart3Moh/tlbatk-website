@@ -4,7 +4,9 @@ export interface Offer {
   id: string;
   title: string;
   description: string;
-  discount: number; // percentage
+  discountType: "percentage" | "fixed"; // percentage (%) or fixed amount
+  discount?: number; // percentage (0-100)
+  fixedPrice?: number; // fixed amount in SAR
   code?: string;
   expiryDate: string; // YYYY-MM-DD
   active: boolean;
