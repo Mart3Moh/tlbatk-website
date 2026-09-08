@@ -9,6 +9,7 @@ const links = [
   { href: "/#services", label: "خدماتنا" },
   { href: "/#integrations", label: "الربط مع متجرك" },
   { href: "/#pricing", label: "الأسعار" },
+  { href: "/offers", label: "العروض" },
   { href: "/#contact", label: "التواصل" },
   { href: "/policy", label: "سياسة التعويض" },
   { href: "/#faq", label: "الأسئلة" },
