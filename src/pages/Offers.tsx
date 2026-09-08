@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Zap, Copy, CheckCircle } from "lucide-react";
+import { ArrowRight, Zap, Copy, CheckCircle, X } from "lucide-react";
 import { useState } from "react";
 import { useOffers } from "../context/OffersContext";
 
 export default function Offers() {
   const { offers } = useOffers();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const activeOffers = offers.filter((o) => o.active && new Date(o.expiryDate) > new Date());
 
@@ -38,20 +39,27 @@ export default function Offers() {
             <p className="text-sm text-ink-soft/60 mt-2">تابعنا للحصول على أحدث العروض</p>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {activeOffers.map((offer) => (
-              <div
-                key={offer.id}
-                className="rounded-3xl border-2 border-leaf bg-white overflow-hidden hover:shadow-lg transition"
-              >
-                {/* Image */}
-                {offer.image && (
-                  <img
-                    src={offer.image}
-                    alt={offer.title}
-                    className="w-full h-48 object-cover"
-                  />
-                )}
+          <>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {activeOffers.map((offer) => (
+                <div
+                  key={offer.id}
+                  className="rounded-3xl border-2 border-leaf bg-white overflow-hidden hover:shadow-lg transition"
+                >
+                  {/* Image */}
+                  {offer.image && (
+                    <button
+                      onClick={() => setSelectedImage(offer.image!)}
+                      className="w-full block hover:opacity-90 transition"
+                      title="اضغط لعرض الصورة بشكل أكبر"
+                    >
+                      <img
+                        src={offer.image}
+                        alt={offer.title}
+                        className="w-full h-48 object-cover cursor-pointer"
+                      />
+                    </button>
+                  )}
 
                 <div className="p-7">
                   {/* Discount Badge */}
@@ -110,6 +118,38 @@ export default function Offers() {
               </div>
             ))}
           </div>
+
+          {/* Image Lightbox */}
+          {selectedImage && (
+            <div
+              className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+              onClick={() => setSelectedImage(null)}
+            >
+              <div
+                className="relative max-w-4xl w-full max-h-[90vh] flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setSelectedImage(null)}
+                  className="absolute -top-10 -right-10 md:top-4 md:right-4 bg-white rounded-full p-2 hover:bg-gray-200 transition z-10"
+                  title="إغلاق"
+                >
+                  <X className="h-6 w-6 text-black" />
+                </button>
+
+                <img
+                  src={selectedImage}
+                  alt="معاينة العرض"
+                  className="w-full h-full object-contain rounded-2xl"
+                />
+
+                <p className="text-center text-white text-sm mt-4">
+                  اضغط الخلفية أو X للإغلاق
+                </p>
+              </div>
+            </div>
+          )}
+        </>
         )}
       </div>
     </main>
