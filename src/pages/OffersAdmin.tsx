@@ -49,7 +49,7 @@ export default function OffersAdmin() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Simple password check (in production, use proper authentication)
-    if (password === "1234") {
+    if (password === "Ad.Os@2030!") {
       setIsAuthenticated(true);
       sessionStorage.setItem("offersAdmin", "true");
       setPassword("");
