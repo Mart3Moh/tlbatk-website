@@ -8,7 +8,11 @@ export default function Offers() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const activeOffers = offers.filter((o) => o.active && new Date(o.expiryDate) > new Date());
+  const activeOffers = offers.filter((o) => {
+    const offerDate = new Date(o.expiryDate);
+    offerDate.setHours(23, 59, 59, 999); // End of day
+    return o.active && offerDate > new Date();
+  });
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
