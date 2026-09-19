@@ -141,7 +141,30 @@ export function OffersProvider({ children }: { children: ReactNode }) {
 
   // Save to IndexedDB whenever offers change
   useEffect(() => {
-    offers.forEach((offer) => saveOffer(offer));
+    const saveAll = async () => {
+      try {
+        const db = await initDB();
+        const transaction = db.transaction(STORE_NAME, "readwrite");
+        const store = transaction.objectStore(STORE_NAME);
+
+        // Clear existing offers and save new ones
+        await new Promise<void>((resolve, reject) => {
+          const clearRequest = store.clear();
+          clearRequest.onerror = () => reject(clearRequest.error);
+          clearRequest.onsuccess = () => {
+            offers.forEach((offer) => store.put(offer));
+            transaction.oncomplete = () => resolve();
+            transaction.onerror = () => reject(transaction.error);
+          };
+        });
+      } catch (e) {
+        console.error("Failed to save all offers:", e);
+      }
+    };
+
+    if (offers.length > 0) {
+      saveAll();
+    }
   }, [offers]);
 
   const addOffer = (offer: Omit<Offer, "id" | "createdAt">) => {
