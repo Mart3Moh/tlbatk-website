@@ -23,26 +23,89 @@ interface OffersContextType {
 
 const OffersContext = createContext<OffersContextType | undefined>(undefined);
 
-const STORAGE_KEY = "tlbatk_offers";
+const DB_NAME = "tlbatk_db";
+const STORE_NAME = "offers";
+
+// Initialize IndexedDB
+const initDB = (): Promise<IDBDatabase> => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: "id" });
+      }
+    };
+  });
+};
+
+// Load all offers from IndexedDB
+const loadOffers = async (): Promise<Offer[]> => {
+  try {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, "readonly");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.getAll();
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve((request.result as Offer[]) || []);
+    });
+  } catch (e) {
+    console.error("Failed to load offers:", e);
+    return [];
+  }
+};
+
+// Save offer to IndexedDB
+const saveOffer = async (offer: Offer): Promise<void> => {
+  try {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put(offer);
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve();
+    });
+  } catch (e) {
+    console.error("Failed to save offer:", e);
+  }
+};
+
+// Delete offer from IndexedDB
+const deleteOfferFromDB = async (id: string): Promise<void> => {
+  try {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.delete(id);
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve();
+    });
+  } catch (e) {
+    console.error("Failed to delete offer:", e);
+  }
+};
 
 export function OffersProvider({ children }: { children: ReactNode }) {
   const [offers, setOffers] = useState<Offer[]>([]);
 
-  // Load from localStorage on mount
+  // Load from IndexedDB on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        setOffers(JSON.parse(stored));
-      } catch (e) {
-        console.error("Failed to load offers:", e);
-      }
-    }
+    loadOffers().then(setOffers);
   }, []);
 
-  // Save to localStorage whenever offers change
+  // Save to IndexedDB whenever offers change
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(offers));
+    offers.forEach((offer) => saveOffer(offer));
   }, [offers]);
 
   const addOffer = (offer: Omit<Offer, "id" | "createdAt">) => {
@@ -55,6 +118,7 @@ export function OffersProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteOffer = (id: string) => {
+    deleteOfferFromDB(id);
     setOffers(offers.filter((o) => o.id !== id));
   };
 
