@@ -25,6 +25,7 @@ const OffersContext = createContext<OffersContextType | undefined>(undefined);
 
 const DB_NAME = "tlbatk_db";
 const STORE_NAME = "offers";
+const STORAGE_KEY = "tlbatk_offers"; // Legacy localStorage key
 
 // Initialize IndexedDB
 const initDB = (): Promise<IDBDatabase> => {
@@ -41,6 +42,34 @@ const initDB = (): Promise<IDBDatabase> => {
       }
     };
   });
+};
+
+// Migrate data from localStorage to IndexedDB
+const migrateFromLocalStorage = async (): Promise<void> => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const offers = JSON.parse(stored);
+      const db = await initDB();
+
+      for (const offer of offers) {
+        await new Promise<void>((resolve, reject) => {
+          const transaction = db.transaction(STORE_NAME, "readwrite");
+          const store = transaction.objectStore(STORE_NAME);
+          const request = store.put(offer);
+
+          request.onerror = () => reject(request.error);
+          request.onsuccess = () => resolve();
+        });
+      }
+
+      // Clear localStorage after migration
+      localStorage.removeItem(STORAGE_KEY);
+      console.log(`Migrated ${offers.length} offers to IndexedDB`);
+    }
+  } catch (e) {
+    console.error("Migration failed:", e);
+  }
 };
 
 // Load all offers from IndexedDB
@@ -98,9 +127,16 @@ const deleteOfferFromDB = async (id: string): Promise<void> => {
 export function OffersProvider({ children }: { children: ReactNode }) {
   const [offers, setOffers] = useState<Offer[]>([]);
 
-  // Load from IndexedDB on mount
+  // Load from IndexedDB on mount (with migration from localStorage)
   useEffect(() => {
-    loadOffers().then(setOffers);
+    const loadData = async () => {
+      // First, try to migrate old data from localStorage
+      await migrateFromLocalStorage();
+      // Then load from IndexedDB
+      const loadedOffers = await loadOffers();
+      setOffers(loadedOffers);
+    };
+    loadData();
   }, []);
 
   // Save to IndexedDB whenever offers change
