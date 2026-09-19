@@ -144,21 +144,32 @@ export function OffersProvider({ children }: { children: ReactNode }) {
     const saveAll = async () => {
       try {
         const db = await initDB();
-        const transaction = db.transaction(STORE_NAME, "readwrite");
-        const store = transaction.objectStore(STORE_NAME);
 
-        // Clear existing offers and save new ones
-        await new Promise<void>((resolve, reject) => {
-          const clearRequest = store.clear();
-          clearRequest.onerror = () => reject(clearRequest.error);
-          clearRequest.onsuccess = () => {
-            offers.forEach((offer) => store.put(offer));
-            transaction.oncomplete = () => resolve();
-            transaction.onerror = () => reject(transaction.error);
+        // Clear and save in a single transaction
+        return new Promise<void>((resolve, reject) => {
+          const transaction = db.transaction(STORE_NAME, "readwrite");
+          const store = transaction.objectStore(STORE_NAME);
+
+          // Clear first
+          store.clear();
+
+          // Add all offers
+          offers.forEach((offer) => {
+            store.put(offer);
+          });
+
+          // Complete transaction
+          transaction.oncomplete = () => {
+            console.log(`Saved ${offers.length} offers to IndexedDB`);
+            resolve();
+          };
+          transaction.onerror = () => {
+            console.error("Transaction error:", transaction.error);
+            reject(transaction.error);
           };
         });
       } catch (e) {
-        console.error("Failed to save all offers:", e);
+        console.error("Failed to save offers:", e);
       }
     };
 
