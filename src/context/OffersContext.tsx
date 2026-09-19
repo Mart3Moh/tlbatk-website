@@ -69,19 +69,6 @@ export function OffersProvider({ children }: { children: ReactNode }) {
     };
 
     loadOffers();
-
-    // Subscribe to real-time updates
-    const subscription = supabase
-      .from("offers")
-      .on("*", (payload) => {
-        // Reload offers when any change happens
-        loadOffers();
-      })
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
   }, []);
 
   const addOffer = async (offer: Omit<Offer, "id" | "createdAt">) => {
