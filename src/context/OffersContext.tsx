@@ -1,209 +1,173 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { supabase } from "../lib/supabase";
 
 export interface Offer {
   id: string;
   title: string;
   description: string;
-  discountType: "percentage" | "fixed"; // percentage (%) or fixed amount
-  discount?: number; // percentage (0-100)
-  fixedPrice?: number; // fixed amount in SAR
+  discountType: "percentage" | "fixed";
+  discount?: number;
+  fixedPrice?: number;
   code?: string;
-  expiryDate: string; // YYYY-MM-DD
+  expiryDate: string;
   active: boolean;
-  image?: string; // base64 encoded image
+  image?: string;
   createdAt: string;
 }
 
 interface OffersContextType {
   offers: Offer[];
-  addOffer: (offer: Omit<Offer, "id" | "createdAt">) => void;
-  deleteOffer: (id: string) => void;
-  updateOffer: (id: string, offer: Omit<Offer, "id" | "createdAt">) => void;
+  addOffer: (offer: Omit<Offer, "id" | "createdAt">) => Promise<void>;
+  deleteOffer: (id: string) => Promise<void>;
+  updateOffer: (id: string, offer: Omit<Offer, "id" | "createdAt">) => Promise<void>;
+  loading: boolean;
 }
 
 const OffersContext = createContext<OffersContextType | undefined>(undefined);
 
-const DB_NAME = "tlbatk_db";
-const STORE_NAME = "offers";
-const STORAGE_KEY = "tlbatk_offers"; // Legacy localStorage key
-
-// Initialize IndexedDB
-const initDB = (): Promise<IDBDatabase> => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
-
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: "id" });
-      }
-    };
-  });
-};
-
-// Migrate data from localStorage to IndexedDB
-const migrateFromLocalStorage = async (): Promise<void> => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const offers = JSON.parse(stored);
-      const db = await initDB();
-
-      for (const offer of offers) {
-        await new Promise<void>((resolve, reject) => {
-          const transaction = db.transaction(STORE_NAME, "readwrite");
-          const store = transaction.objectStore(STORE_NAME);
-          const request = store.put(offer);
-
-          request.onerror = () => reject(request.error);
-          request.onsuccess = () => resolve();
-        });
-      }
-
-      // Clear localStorage after migration
-      localStorage.removeItem(STORAGE_KEY);
-      console.log(`Migrated ${offers.length} offers to IndexedDB`);
-    }
-  } catch (e) {
-    console.error("Migration failed:", e);
-  }
-};
-
-// Load all offers from IndexedDB
-const loadOffers = async (): Promise<Offer[]> => {
-  try {
-    const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(STORE_NAME, "readonly");
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.getAll();
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve((request.result as Offer[]) || []);
-    });
-  } catch (e) {
-    console.error("Failed to load offers:", e);
-    return [];
-  }
-};
-
-// Save offer to IndexedDB
-const saveOffer = async (offer: Offer): Promise<void> => {
-  try {
-    const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(STORE_NAME, "readwrite");
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.put(offer);
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
-    });
-  } catch (e) {
-    console.error("Failed to save offer:", e);
-  }
-};
-
-// Delete offer from IndexedDB
-const deleteOfferFromDB = async (id: string): Promise<void> => {
-  try {
-    const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(STORE_NAME, "readwrite");
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.delete(id);
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
-    });
-  } catch (e) {
-    console.error("Failed to delete offer:", e);
-  }
-};
+// Transform Supabase data to Offer interface
+const transformOffer = (data: any): Offer => ({
+  id: data.id.toString(),
+  title: data.title,
+  description: data.description,
+  discountType: data.discount_type,
+  discount: data.discount,
+  fixedPrice: data.fixed_price,
+  code: data.code,
+  expiryDate: data.expiry_date,
+  active: data.active,
+  image: data.image,
+  createdAt: data.created_at,
+});
 
 export function OffersProvider({ children }: { children: ReactNode }) {
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load from IndexedDB on mount (with migration from localStorage)
+  // Load offers from Supabase on mount
   useEffect(() => {
-    const loadData = async () => {
-      // First, try to migrate old data from localStorage
-      await migrateFromLocalStorage();
-      // Then load from IndexedDB
-      const loadedOffers = await loadOffers();
-      setOffers(loadedOffers);
-    };
-    loadData();
-  }, []);
-
-  // Save to IndexedDB whenever offers change
-  useEffect(() => {
-    const saveAll = async () => {
+    const loadOffers = async () => {
       try {
-        const db = await initDB();
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("offers")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-        // Clear and save in a single transaction
-        return new Promise<void>((resolve, reject) => {
-          const transaction = db.transaction(STORE_NAME, "readwrite");
-          const store = transaction.objectStore(STORE_NAME);
+        if (error) {
+          console.error("Failed to load offers:", error);
+          return;
+        }
 
-          // Clear first
-          store.clear();
-
-          // Add all offers
-          offers.forEach((offer) => {
-            store.put(offer);
-          });
-
-          // Complete transaction
-          transaction.oncomplete = () => {
-            console.log(`Saved ${offers.length} offers to IndexedDB`);
-            resolve();
-          };
-          transaction.onerror = () => {
-            console.error("Transaction error:", transaction.error);
-            reject(transaction.error);
-          };
-        });
+        const transformedOffers = (data || []).map(transformOffer);
+        setOffers(transformedOffers);
       } catch (e) {
-        console.error("Failed to save offers:", e);
+        console.error("Error loading offers:", e);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (offers.length > 0) {
-      saveAll();
-    }
-  }, [offers]);
+    loadOffers();
 
-  const addOffer = (offer: Omit<Offer, "id" | "createdAt">) => {
-    const newOffer: Offer = {
-      ...offer,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
+    // Subscribe to real-time updates
+    const subscription = supabase
+      .from("offers")
+      .on("*", (payload) => {
+        // Reload offers when any change happens
+        loadOffers();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
     };
-    setOffers([newOffer, ...offers]);
+  }, []);
+
+  const addOffer = async (offer: Omit<Offer, "id" | "createdAt">) => {
+    try {
+      const { data, error } = await supabase
+        .from("offers")
+        .insert([
+          {
+            title: offer.title,
+            description: offer.description,
+            discount_type: offer.discountType,
+            discount: offer.discount,
+            fixed_price: offer.fixedPrice,
+            code: offer.code,
+            expiry_date: offer.expiryDate,
+            active: offer.active,
+            image: offer.image,
+          },
+        ])
+        .select();
+
+      if (error) {
+        console.error("Failed to add offer:", error);
+        throw error;
+      }
+
+      const newOffer = transformOffer(data[0]);
+      setOffers([newOffer, ...offers]);
+    } catch (e) {
+      console.error("Error adding offer:", e);
+      throw e;
+    }
   };
 
-  const deleteOffer = (id: string) => {
-    deleteOfferFromDB(id);
-    setOffers(offers.filter((o) => o.id !== id));
+  const deleteOffer = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("offers")
+        .delete()
+        .eq("id", parseInt(id));
+
+      if (error) {
+        console.error("Failed to delete offer:", error);
+        throw error;
+      }
+
+      setOffers(offers.filter((o) => o.id !== id));
+    } catch (e) {
+      console.error("Error deleting offer:", e);
+      throw e;
+    }
   };
 
-  const updateOffer = (id: string, offer: Omit<Offer, "id" | "createdAt">) => {
-    setOffers(
-      offers.map((o) =>
-        o.id === id
-          ? { ...o, ...offer }
-          : o
-      )
-    );
+  const updateOffer = async (id: string, offer: Omit<Offer, "id" | "createdAt">) => {
+    try {
+      const { data, error } = await supabase
+        .from("offers")
+        .update({
+          title: offer.title,
+          description: offer.description,
+          discount_type: offer.discountType,
+          discount: offer.discount,
+          fixed_price: offer.fixedPrice,
+          code: offer.code,
+          expiry_date: offer.expiryDate,
+          active: offer.active,
+          image: offer.image,
+        })
+        .eq("id", parseInt(id))
+        .select();
+
+      if (error) {
+        console.error("Failed to update offer:", error);
+        throw error;
+      }
+
+      const updatedOffer = transformOffer(data[0]);
+      setOffers(offers.map((o) => (o.id === id ? updatedOffer : o)));
+    } catch (e) {
+      console.error("Error updating offer:", e);
+      throw e;
+    }
   };
 
   return (
-    <OffersContext.Provider value={{ offers, addOffer, deleteOffer, updateOffer }}>
+    <OffersContext.Provider value={{ offers, addOffer, deleteOffer, updateOffer, loading }}>
       {children}
     </OffersContext.Provider>
   );

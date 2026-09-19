@@ -66,7 +66,7 @@ export default function OffersAdmin() {
     sessionStorage.removeItem("offersAdmin");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.title.trim() || !formData.description.trim() || !formData.expiryDate) {
@@ -79,29 +79,34 @@ export default function OffersAdmin() {
       return;
     }
 
-    if (editingId) {
-      updateOffer(editingId, formData);
-      setSubmitMessage("✓ تم تحديث العرض بنجاح");
-      setEditingId(null);
-    } else {
-      addOffer(formData);
-      setSubmitMessage("✓ تم إضافة العرض بنجاح");
+    try {
+      if (editingId) {
+        await updateOffer(editingId, formData);
+        setSubmitMessage("✓ تم تحديث العرض بنجاح");
+        setEditingId(null);
+      } else {
+        await addOffer(formData);
+        setSubmitMessage("✓ تم إضافة العرض بنجاح");
+      }
+
+      setFormData({
+        title: "",
+        description: "",
+        discountType: "percentage",
+        discount: 10,
+        fixedPrice: 0,
+        code: "",
+        expiryDate: "",
+        active: true,
+        image: "",
+      });
+      setImagePreview(null);
+
+      setTimeout(() => setSubmitMessage(""), 3000);
+    } catch (error) {
+      setSubmitMessage("❌ حدث خطأ: تحقق من الاتصال بالإنترنت");
+      console.error("Submit error:", error);
     }
-
-    setFormData({
-      title: "",
-      description: "",
-      discountType: "percentage",
-      discount: 10,
-      fixedPrice: 0,
-      code: "",
-      expiryDate: "",
-      active: true,
-      image: "",
-    });
-    setImagePreview(null);
-
-    setTimeout(() => setSubmitMessage(""), 3000);
   };
 
   const handleEdit = (offer: Offer) => {
@@ -413,7 +418,15 @@ export default function OffersAdmin() {
                         <Edit2 className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => deleteOffer(offer.id)}
+                        onClick={async () => {
+                          if (confirm("هل أنت متأكد من حذف هذا العرض؟")) {
+                            try {
+                              await deleteOffer(offer.id);
+                            } catch (error) {
+                              console.error("Delete error:", error);
+                            }
+                          }
+                        }}
                         className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition"
                         title="حذف"
                       >
